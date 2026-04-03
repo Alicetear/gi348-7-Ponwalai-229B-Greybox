@@ -48,7 +48,6 @@ public class DeathManager : MonoBehaviour
         if (playerHealth != null)
         {
             playerHealth.ResetDeathState();
-            save.LoadGame();
         }
 
         deathUI.SetActive(false);
