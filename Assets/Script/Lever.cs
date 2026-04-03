@@ -3,7 +3,7 @@ using UnityEngine;
 public class Lever : MonoBehaviour
 {
     public GameObject door;
-    public bool hasPower;
+    public bool hasPower = true;
 
     private bool playerInRange = false;
 
@@ -21,6 +21,7 @@ public class Lever : MonoBehaviour
             {
                 Debug.Log("Door Open");
                 door.SetActive(false);
+                Destroy(door);
             }
         }
     }

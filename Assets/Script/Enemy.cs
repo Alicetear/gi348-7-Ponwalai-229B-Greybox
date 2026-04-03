@@ -6,7 +6,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] Transform target;
     [SerializeField] Transform[] patrolPoints;
 
-    [SerializeField] float detectRange = 10f;
+    [SerializeField] float detectRange = 8f;
     [SerializeField] float patrolWaitTime = 2f;
 
     NavMeshAgent agent;
