@@ -6027,7 +6027,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   target: {fileID: 411133974}
   patrolPoints: []
-  detectRange: 4.5
+  detectRange: 3.5
   patrolWaitTime: 8
 --- !u!195 &367276458
 NavMeshAgent:
@@ -7994,7 +7994,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   target: {fileID: 411133974}
   patrolPoints: []
-  detectRange: 4.5
+  detectRange: 3.5
   patrolWaitTime: 8
 --- !u!195 &463298819
 NavMeshAgent:
@@ -18889,7 +18889,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   target: {fileID: 411133974}
   patrolPoints: []
-  detectRange: 4.5
+  detectRange: 3.5
   patrolWaitTime: 8
 --- !u!195 &1104503402
 NavMeshAgent:
@@ -20489,7 +20489,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   target: {fileID: 411133974}
   patrolPoints: []
-  detectRange: 4.5
+  detectRange: 3.5
   patrolWaitTime: 8
 --- !u!195 &1183219234
 NavMeshAgent:
@@ -23657,7 +23657,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   target: {fileID: 411133974}
   patrolPoints: []
-  detectRange: 4.5
+  detectRange: 3.5
   patrolWaitTime: 8
 --- !u!195 &1378754903
 NavMeshAgent:
@@ -30426,7 +30426,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   target: {fileID: 411133974}
   patrolPoints: []
-  detectRange: 4.5
+  detectRange: 3.5
   patrolWaitTime: 8
 --- !u!195 &1703004029
 NavMeshAgent:
