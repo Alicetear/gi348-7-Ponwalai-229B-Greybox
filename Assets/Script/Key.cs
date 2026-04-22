@@ -20,7 +20,7 @@ public class Key : MonoBehaviour
 
     void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        if (playerInRange && Input.GetKeyDown(KeyCode.F))
         {
             player.AddKey(amount, color);
             Destroy(gameObject);

@@ -6,12 +6,18 @@ public class PowerSlot : MonoBehaviour
     public Lever leverScript;
     public GameObject lever;
 
+    [Header("Save System")]
+    public string powerSlotID;
+
     private bool playerInRange = false;
     private PlayerFuel playerFuel;
+    private bool isActivated = false;
+
+    // ? ?? Awake ??? SaveSystem ????? Activate(false) ???
 
     void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        if (playerInRange && Input.GetKeyDown(KeyCode.E) && !isActivated)
         {
             if (playerFuel == null)
             {
@@ -20,19 +26,27 @@ public class PowerSlot : MonoBehaviour
             }
 
             if (playerFuel.fuel <= 0)
-            {
                 Debug.Log("No Power");
-            }
             else if (playerFuel.fuel < requiredFuel)
-            {
-                int need = requiredFuel - playerFuel.fuel;
-                Debug.Log("Need more: " + need);
-            }
+                Debug.Log("Need more: " + (requiredFuel - playerFuel.fuel));
             else
-            {
-                Debug.Log("Power ON");
-                Activate();
-            }
+                Activate(true);
+        }
+    }
+
+    // ? ??????????? public ???????? SaveSystem ????????
+    public void Activate(bool saveState)
+    {
+        isActivated = true;
+
+        if (saveState && SaveSystem.Instance != null && !string.IsNullOrEmpty(powerSlotID))
+            if (!SaveSystem.Instance.currentOpenedDoors.Contains(powerSlotID))
+                SaveSystem.Instance.currentOpenedDoors.Add(powerSlotID);
+
+        if (leverScript != null)
+        {
+            leverScript.hasPower = true;
+            Debug.Log("Power ON");
         }
     }
 
@@ -51,16 +65,6 @@ public class PowerSlot : MonoBehaviour
         {
             playerInRange = false;
             playerFuel = null;
-        }
-    }
-
-    void Activate()
-    {
-        Debug.Log("Activated Power");
-
-        if (leverScript != null)
-        {
-            leverScript.hasPower = true; 
         }
     }
 }

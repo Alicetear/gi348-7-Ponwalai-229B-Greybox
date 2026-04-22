@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class playerkey : MonoBehaviour
 {
+    [Header("Key Inventory")]
     public int redKey = 0;
     public int blueKey = 0;
     public int greenKey = 0;
@@ -9,56 +10,45 @@ public class playerkey : MonoBehaviour
     public int purpleKey = 0;
     public int pinkKey = 0;
 
+
     public void AddKey(int amount, KeyColor color)
     {
-        if (color == KeyColor.Red) redKey += amount;
-        if (color == KeyColor.Blue) blueKey += amount;
-        if (color == KeyColor.Green) greenKey += amount;
-        if (color == KeyColor.Yellow) yellowKey += amount;
-        if (color == KeyColor.Purple) purpleKey += amount;
-        if (color == KeyColor.Pink) pinkKey += amount;
+        switch (color)
+        {
+            case KeyColor.Red: redKey += amount; break;
+            case KeyColor.Blue: blueKey += amount; break;
+            case KeyColor.Green: greenKey += amount; break;
+            case KeyColor.Yellow: yellowKey += amount; break;
+            case KeyColor.Purple: purpleKey += amount; break;
+            case KeyColor.Pink: pinkKey += amount; break;
+        }
 
-        Debug.Log("Red: " + redKey + " Blue: " + blueKey + " Green: " + greenKey + " Yellow: " + yellowKey + " Purple: " + purpleKey + " Pink: " + pinkKey);
+        Debug.Log($"Key Added! Total -> R:{redKey} B:{blueKey} G:{greenKey} Y:{yellowKey} P:{purpleKey} Pi:{pinkKey}");
     }
 
     public bool UseKey(int amount, KeyColor doorColor)
     {
-        if (doorColor == KeyColor.Red && redKey >= amount)
+        switch (doorColor)
         {
-            redKey -= amount;
-            return true;
+            case KeyColor.Red:
+                if (redKey >= amount) { redKey -= amount; return true; }
+                break;
+            case KeyColor.Blue:
+                if (blueKey >= amount) { blueKey -= amount; return true; }
+                break;
+            case KeyColor.Green:
+                if (greenKey >= amount) { greenKey -= amount; return true; }
+                break;
+            case KeyColor.Yellow:
+                if (yellowKey >= amount) { yellowKey -= amount; return true; }
+                break;
+            case KeyColor.Purple:
+                if (purpleKey >= amount) { purpleKey -= amount; return true; }
+                break;
+            case KeyColor.Pink:
+                if (pinkKey >= amount) { pinkKey -= amount; return true; }
+                break;
         }
-
-        if (doorColor == KeyColor.Blue && blueKey >= amount)
-        {
-            blueKey -= amount;
-            return true;
-        }
-
-        if (doorColor == KeyColor.Green && greenKey >= amount)
-        {
-            greenKey -= amount;
-            return true;
-        }
-
-        if (doorColor == KeyColor.Yellow && yellowKey >= amount)
-        {
-            yellowKey -= amount;
-            return true;
-        }
-
-        if (doorColor == KeyColor.Purple && purpleKey >= amount)
-        {
-            purpleKey -= amount;
-            return true;
-        }
-
-        if (doorColor == KeyColor.Pink && pinkKey >= amount)
-        {
-            pinkKey -= amount;
-            return true;
-        }
-
         return false;
     }
 }

@@ -4,7 +4,6 @@ using UnityEngine.SceneManagement;
 public class DeathManager : MonoBehaviour
 {
     public GameObject deathUI;
-
     private bool isDead = false;
 
     void Start()
@@ -17,62 +16,40 @@ public class DeathManager : MonoBehaviour
 
     public void ShowDeathUI()
     {
-        Debug.Log("ShowDeathUI called");
-
         if (isDead) return;
-
         isDead = true;
 
         if (deathUI != null)
         {
             deathUI.SetActive(true);
-            Debug.Log("DeathUI opened");
+            Time.timeScale = 0f;
         }
-        else
-        {
-            Debug.LogError("deathUI is NULL! ??? DeathUI ????? Inspector ????");
-        }
-
-        Time.timeScale = 0f;
     }
 
     public void LoadLastSave()
     {
-        SaveSystem save = FindObjectOfType<SaveSystem>();
-        PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
+        SaveSystem save = FindFirstObjectByType<SaveSystem>();
+
         if (save != null)
         {
-            save.LoadGame();
-        }
+            if (deathUI != null)
+                deathUI.SetActive(false);
 
-        if (playerHealth != null)
-        {
-            playerHealth.ResetDeathState();
-        }
+            Time.timeScale = 1f;
 
-        deathUI.SetActive(false);
-        Time.timeScale = 1f;
-        isDead = false;
+            save.LoadGameFromMenu(0); 
+        }
     }
 
-    public void CloseDeathUI()
+    public void NewGame()
     {
         if (deathUI != null)
             deathUI.SetActive(false);
 
         Time.timeScale = 1f;
-        isDead = false;
-    }
 
-    public void RetryScene()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
+        PlayerPrefs.Save();
 
-    public void GoToMainMenu()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

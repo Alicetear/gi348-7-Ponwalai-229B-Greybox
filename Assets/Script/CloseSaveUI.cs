@@ -2,11 +2,16 @@ using UnityEngine;
 
 public class CloseSaveUI : MonoBehaviour
 {
-    public GameObject saveUI;
+    public SavePoint savePoint;
 
     public void Close()
     {
-        saveUI.SetActive(false);
-        Time.timeScale = 1f; 
+        if (savePoint == null)
+        {
+            Debug.LogError("CloseSaveUI: savePoint is not assigned");
+            return;
+        }
+
+        savePoint.CloseSaveUI(); 
     }
 }

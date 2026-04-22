@@ -1,63 +1,43 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
     public int maxHealth = 100;
     public int currentHealth;
-
     private bool isDead = false;
 
     void Start()
     {
-        currentHealth = maxHealth;
+        if (!SaveSystem.isRespawning)
+            currentHealth = maxHealth;
     }
 
     public void TakeDamage(int damage)
     {
         if (isDead) return;
-
         currentHealth -= damage;
-        Debug.Log("Player HP: " + currentHealth);
-
-        if (currentHealth <= 0)
-        {
-            currentHealth = 0;
-            Die();
-        }
+        if (currentHealth <= 0) { currentHealth = 0; Die(); }
     }
 
     void Die()
     {
+        if (isDead) return; // ? ??? Die ???
         isDead = true;
-        Debug.Log("Player Died");
 
-        DeathManager dm = FindObjectOfType<DeathManager>();
+        DeathManager dm = FindFirstObjectByType<DeathManager>();
+        if (dm != null) dm.ShowDeathUI();
 
-        if (dm != null)
-        {
-            dm.ShowDeathUI();
-        }
-        else
-        {
-            Debug.LogError("DeathManager not found in scene!");
-        }
+        Invoke("Respawn", 2f);
     }
 
-    public void RevivePlayer()
+    void Respawn()
     {
-        isDead = false;
-
-        if (currentHealth <= 0)
-        {
-            currentHealth = maxHealth; 
-        }
-
-        gameObject.SetActive(true);
+        if (SaveSystem.Instance != null)
+            SaveSystem.Instance.RespawnAtLastSave();
     }
 
     public void ResetDeathState()
     {
-        isDead = false;
+        isDead = false; // ? reset ?????? damage ???????
     }
 }

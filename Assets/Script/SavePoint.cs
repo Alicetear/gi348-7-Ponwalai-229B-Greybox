@@ -1,58 +1,89 @@
 using UnityEngine;
+using System;
+using UnityEngine.SceneManagement;
+using System.Collections;
+using System.Collections.Generic;
 
 public class SavePoint : MonoBehaviour
 {
     public GameObject saveUI;
-    public GameObject pressEText; 
+    public GameObject pressEText;
+    public SaveSystem saveSystem;
+    public SaveSlotUI[] slots;
 
-    private bool playerInRange = false;
-    private bool isOpen = false;
+    bool playerInRange = false;
+    bool isOpen = false;
+    string currentScreenshot = "";
 
     void Start()
     {
-        if (saveUI != null)
-            saveUI.SetActive(false);
+        // ? ??? Instance ??? SaveSystem ???????????????????? (???????????? DontDestroyOnLoad)
+        if (saveSystem == null) saveSystem = SaveSystem.Instance;
 
-        if (pressEText != null)
-            pressEText.SetActive(false);
-
-        Time.timeScale = 1f;
+        if (saveUI != null) saveUI.SetActive(false);
     }
 
     void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        // ??????????? KeyCode.F ????????????????
+        if (playerInRange && !isOpen && Input.GetKeyDown(KeyCode.F))
         {
-            if (!isOpen)
-            {
-                OpenSaveUI();
-            }
+            StartCoroutine(OpenWithScreenshot());
         }
 
-        if (isOpen && Input.GetKeyDown(KeyCode.Escape))
+        if (isOpen && Input.GetKeyDown(KeyCode.Escape)) CloseSaveUI();
+    }
+
+    IEnumerator OpenWithScreenshot()
+    {
+        yield return new WaitForEndOfFrame();
+
+        // ??????? Screenshot ????????????????
+        Texture2D tex = ScreenCapture.CaptureScreenshotAsTexture();
+        if (tex != null)
         {
-            CloseSaveUI();
+            byte[] bytes = tex.EncodeToJPG(40);
+            currentScreenshot = Convert.ToBase64String(bytes);
+            Destroy(tex);
+        }
+
+        // ???? UI ???????????
+        saveUI.SetActive(true);
+        Time.timeScale = 0f;
+        isOpen = true;
+
+        // ? ?????: ????????????????????? ?????????????????? Slot ??????? PlayerPrefs
+        RefreshSlots();
+    }
+
+    public void RefreshSlots()
+    {
+        // ??????? SaveSystem ????????????????????????????
+        if (saveSystem == null) saveSystem = SaveSystem.Instance;
+        if (slots == null || saveSystem == null) return;
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            // ?????????????????? PlayerPrefs (???????????????????????????????)
+            SaveData data = saveSystem.GetSlotData(i);
+            slots[i].Setup(i, data, this);
         }
     }
 
-    void OpenSaveUI()
+    public void OnSlotSavePressed(int slot)
     {
-        saveUI.SetActive(true);
+        // ???????????????? (PlayerPrefs.SetString ????????????????????????)
+        saveSystem.SaveGame(slot, currentScreenshot);
 
-        if (pressEText != null)
-            pressEText.SetActive(false);
+        // ? ?????? UI ?????????????? ?????????????????????????????????
+        RefreshSlots();
 
-        Time.timeScale = 0f;
-        isOpen = true;
+        Debug.Log("Slot " + slot + " updated with new position and screenshot.");
     }
 
     public void CloseSaveUI()
     {
-        saveUI.SetActive(false);
-
-        if (playerInRange && pressEText != null)
-            pressEText.SetActive(true);
-
+        if (saveUI != null) saveUI.SetActive(false);
         Time.timeScale = 1f;
         isOpen = false;
     }
@@ -62,9 +93,7 @@ public class SavePoint : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = true;
-
-            if (!isOpen && pressEText != null)
-                pressEText.SetActive(true);
+            if (pressEText) pressEText.SetActive(true);
         }
     }
 
@@ -73,9 +102,8 @@ public class SavePoint : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
-
-            if (pressEText != null)
-                pressEText.SetActive(false);
+            if (pressEText) pressEText.SetActive(false);
+            CloseSaveUI();
         }
     }
 }
