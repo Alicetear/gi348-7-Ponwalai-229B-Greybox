@@ -2,22 +2,17 @@ using UnityEngine;
 
 public class PlayerFuel : MonoBehaviour
 {
-    public int fuel = 0;
-    public int currentFuel;
+    public int amount = 1;
 
-    public void AddFuel(int amount)
+    void OnTriggerEnter2D(Collider2D other)
     {
-        fuel += amount;
-        Debug.Log("Fuel: " + fuel);
-    }
-
-    public bool UseFuel(int amount)
-    {
-        if (fuel >= amount)
+        if (other.CompareTag("Player"))
         {
-            fuel -= amount;
-            return true;
+            PlayerInventory inventory = other.GetComponent<PlayerInventory>();
+            if (inventory != null && inventory.AddFuel(amount))
+            {
+                Destroy(gameObject);
+            }
         }
-        return false;
     }
 }

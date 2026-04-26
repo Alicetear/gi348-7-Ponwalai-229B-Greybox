@@ -10,31 +10,32 @@ public class PowerSlot : MonoBehaviour
     public string powerSlotID;
 
     private bool playerInRange = false;
-    private PlayerFuel playerFuel;
     private bool isActivated = false;
-
-    // ? ?? Awake ??? SaveSystem ????? Activate(false) ???
 
     void Update()
     {
         if (playerInRange && Input.GetKeyDown(KeyCode.E) && !isActivated)
         {
-            if (playerFuel == null)
+            PlayerInventory inventory = PlayerInventory.Instance;
+
+            if (inventory == null)
             {
-                Debug.Log("No PlayerFuel");
+                Debug.Log("No PlayerInventory");
                 return;
             }
 
-            if (playerFuel.fuel <= 0)
+            if (inventory.GetFuel() <= 0)
                 Debug.Log("No Power");
-            else if (playerFuel.fuel < requiredFuel)
-                Debug.Log("Need more: " + (requiredFuel - playerFuel.fuel));
+            else if (inventory.GetFuel() < requiredFuel)
+                Debug.Log("Need more: " + (requiredFuel - inventory.GetFuel()));
             else
+            {
+                inventory.UseFuel(requiredFuel);
                 Activate(true);
+            }
         }
     }
 
-    // ? ??????????? public ???????? SaveSystem ????????
     public void Activate(bool saveState)
     {
         isActivated = true;
@@ -53,18 +54,12 @@ public class PowerSlot : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D col)
     {
         if (col.CompareTag("Player"))
-        {
             playerInRange = true;
-            playerFuel = col.GetComponent<PlayerFuel>();
-        }
     }
 
     private void OnTriggerExit2D(Collider2D col)
     {
         if (col.CompareTag("Player"))
-        {
             playerInRange = false;
-            playerFuel = null;
-        }
     }
 }

@@ -8,9 +8,11 @@ public class FuelPickup : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            PlayerFuel player = other.GetComponent<PlayerFuel>();
-                player.fuel += amount;
+            PlayerInventory inventory = other.GetComponent<PlayerInventory>();
+            if (inventory != null && inventory.AddFuel(amount))
+            {
                 Destroy(gameObject);
+            }
         }
     }
 }

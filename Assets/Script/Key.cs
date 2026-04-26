@@ -16,13 +16,13 @@ public class Key : MonoBehaviour
     public KeyColor color;
 
     private bool playerInRange = false;
-    private playerkey player;
+    private PlayerInventory inventory;
 
     void Update()
     {
         if (playerInRange && Input.GetKeyDown(KeyCode.F))
         {
-            player.AddKey(amount, color);
+            inventory.AddKey(amount, color);
             Destroy(gameObject);
         }
     }
@@ -32,7 +32,7 @@ public class Key : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = true;
-            player = other.GetComponent<playerkey>();
+            inventory = other.GetComponent<PlayerInventory>();
         }
     }
 
@@ -41,7 +41,7 @@ public class Key : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
-            player = null;
+            inventory = null;
         }
     }
 }
