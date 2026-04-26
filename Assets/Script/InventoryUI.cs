@@ -67,8 +67,6 @@ public class InventoryUI : MonoBehaviour
         int cur = PlayerInventory.Instance.GetFuel();
         int max = PlayerInventory.Instance.maxFuel;
 
-        if (fuelText != null)
-            fuelText.text = $"Fuel: {cur} / {max}";
 
         if (fuelSlider != null)
         {

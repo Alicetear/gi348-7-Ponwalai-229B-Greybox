@@ -60,9 +60,6 @@ public class KeySlotUI : MonoBehaviour, IPointerClickHandler
     RectTransform myRT = GetComponent<RectTransform>();
     rt.position = myRT.position;
 
-    KeyContextMenu menu = activeMenu.GetComponent<KeyContextMenu>();
-    if (menu != null)
-        menu.Setup(color, this);
 }
 
     public void CloseMenu()

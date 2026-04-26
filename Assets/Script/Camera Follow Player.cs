@@ -5,8 +5,14 @@ public class CameraFollowPlayer : MonoBehaviour
     public Transform player;
 
     [Header("Boundary Settings")]
-    public bool useBoundaries = true; 
-    public float minX, maxX, minY, maxY; 
+    public bool useBoundaries = true;
+    public float minX, maxX, minY, maxY;
+
+    void Start()
+    {
+        if (player == null)
+            player = GameObject.FindGameObjectWithTag("Player").transform;
+    }
 
     void LateUpdate()
     {
@@ -21,7 +27,6 @@ public class CameraFollowPlayer : MonoBehaviour
             targetY = Mathf.Clamp(targetY, minY, maxY);
         }
 
-        // 3. ???????????????????????????? (Z ???? -10 ????)
         transform.position = new Vector3(targetX, targetY, -10f);
     }
 }

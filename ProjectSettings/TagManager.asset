@@ -9,6 +9,7 @@ TagManager:
   - Enemy
   - Switch
   - Field
+  - Key
   layers:
   - Default
   - TransparentFX

@@ -76,28 +76,23 @@ public class SaveSystem : MonoBehaviour
             yield break;
         }
 
-        // ? ???? IDs ????
         currentOpenedDoors = new List<string>(data.openedDoorIDs);
 
-        // ? ???????????????????????
         Door[] allDoors = UnityEngine.Object.FindObjectsByType<Door>(FindObjectsSortMode.None);
         foreach (Door d in allDoors)
             if (!string.IsNullOrEmpty(d.doorID) && currentOpenedDoors.Contains(d.doorID))
                 d.SetOpenedFromSave();
 
-        // ? ???? Lever ?????????????
         Lever[] allLevers = UnityEngine.Object.FindObjectsByType<Lever>(FindObjectsSortMode.None);
         foreach (Lever l in allLevers)
             if (!string.IsNullOrEmpty(l.leverID) && currentOpenedDoors.Contains(l.leverID))
                 l.Activate(false);
 
-        // ? ???? PowerSlot ????????????????
         PowerSlot[] allPowerSlots = UnityEngine.Object.FindObjectsByType<PowerSlot>(FindObjectsSortMode.None);
         foreach (PowerSlot ps in allPowerSlots)
             if (!string.IsNullOrEmpty(ps.powerSlotID) && currentOpenedDoors.Contains(ps.powerSlotID))
                 ps.Activate(false);
 
-        // ? ?????????????? HP
         player.position = new Vector2(data.posX, data.posY);
 
         if (playerHealth != null)
