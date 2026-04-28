@@ -1,7 +1,9 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class Lever : MonoBehaviour
 {
+    public Light2D globalLight;
     public GameObject door;
     public bool hasPower = false;
 
@@ -11,7 +13,6 @@ public class Lever : MonoBehaviour
     private bool playerInRange = false;
     private bool isActivated = false;
 
-    // ? ????? Awake ???? SaveSystem ????? Activate(false) ???
 
     void Update()
     {
@@ -27,6 +28,9 @@ public class Lever : MonoBehaviour
     public void Activate(bool saveState)
     {
         isActivated = true;
+
+        if (globalLight != null)       
+            globalLight.intensity = 1f;
 
         if (saveState && SaveSystem.Instance != null && !string.IsNullOrEmpty(leverID))
             if (!SaveSystem.Instance.currentOpenedDoors.Contains(leverID))

@@ -6,7 +6,7 @@ public class PlayerInventory : MonoBehaviour
     public static PlayerInventory Instance { get; private set; }
 
     [Header("Fuel")]
-    public int maxFuel = 10;
+    public int maxFuel = 2;
     public int currentFuel = 0;
 
     [Header("Keys")]

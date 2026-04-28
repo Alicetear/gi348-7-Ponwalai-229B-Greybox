@@ -13,6 +13,7 @@ public class EnemyAttack : MonoBehaviour
             if (player != null)
             {
                 player.TakeDamage(damage);
+                Debug.Log("Health: " + player.currentHealth);
             }
         }
     }

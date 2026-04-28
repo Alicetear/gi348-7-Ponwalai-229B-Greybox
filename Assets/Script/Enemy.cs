@@ -17,38 +17,42 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-
         agent.updateRotation = false;
         agent.updateUpAxis = false;
 
-        if (agent.isOnNavMesh == false)
-            return;
+        if (target == null)
+        {
+            GameObject player = GameObject.FindWithTag("Player");
+            if (player != null)
+                target = player.transform;
+        }
 
-        if (patrolPoints.Length > 0)
-            GoToNextPoint();
+        if (agent.isOnNavMesh == false) return;
+        if (patrolPoints.Length > 0) GoToNextPoint();
     }
 
     void Update()
     {
-        if (agent == null)
-            return;
-
-        if (!agent.isOnNavMesh)
-            return;
+        if (agent == null) return;
+        if (!agent.isOnNavMesh) return;
 
         if (target == null)
-            return;
+        {
+            GameObject player = GameObject.FindWithTag("Player");
+            if (player != null)
+                target = player.transform;
+            else
+            {
+                Patrol();
+                return;
+            }
+        }
 
         float distance = Vector3.Distance(transform.position, target.position);
-
         if (distance <= detectRange)
-        {
             agent.SetDestination(target.position);
-        }
         else
-        {
             Patrol();
-        }
     }
 
     void Patrol()

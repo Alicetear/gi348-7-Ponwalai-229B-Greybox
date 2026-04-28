@@ -21,13 +21,12 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
-        if (isDead) return; // ? ??? Die ???
+        if (isDead) return; 
         isDead = true;
 
         DeathManager dm = FindFirstObjectByType<DeathManager>();
         if (dm != null) dm.ShowDeathUI();
 
-        Invoke("Respawn", 2f);
     }
 
     void Respawn()
@@ -38,6 +37,6 @@ public class PlayerHealth : MonoBehaviour
 
     public void ResetDeathState()
     {
-        isDead = false; // ? reset ?????? damage ???????
+        isDead = false; 
     }
 }

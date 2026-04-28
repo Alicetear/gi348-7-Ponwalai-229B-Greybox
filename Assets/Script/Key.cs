@@ -8,7 +8,8 @@ public enum KeyColor
     Green,
     Yellow,
     Purple,
-    Pink
+    Pink,
+    Fuel
 }
 public class Key : MonoBehaviour
 {

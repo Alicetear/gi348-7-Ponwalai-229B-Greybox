@@ -56,7 +56,6 @@ public class KeySlotUI : MonoBehaviour, IPointerClickHandler
     RectTransform rt = activeMenu.GetComponent<RectTransform>();
     rt.localScale = Vector3.one;
 
-    // spawn ?????????? slot ???
     RectTransform myRT = GetComponent<RectTransform>();
     rt.position = myRT.position;
 

@@ -10,30 +10,24 @@ public class LevelMove_Ref : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        print("Trigger Entered");
-
         if (other.tag == "Player")
         {
-            print("Switching Scene to " + sceneBuildIndex);
             StartCoroutine(FadeAndLoad());
         }
     }
 
     IEnumerator FadeAndLoad()
     {
-        // ????? Canvas
+        // Fade to black
         GameObject canvasObj = new GameObject("FadeCanvas");
         Canvas canvas = canvasObj.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 999;
-
         canvasObj.AddComponent<CanvasScaler>();
         canvasObj.AddComponent<GraphicRaycaster>();
 
-        // ????????????????
         GameObject imageObj = new GameObject("FadeImage");
         imageObj.transform.SetParent(canvasObj.transform, false);
-
         Image fadeImage = imageObj.AddComponent<Image>();
         fadeImage.color = new Color(0, 0, 0, 0);
 
@@ -45,15 +39,35 @@ public class LevelMove_Ref : MonoBehaviour
 
         float time = 0f;
         float duration = 1f;
-
         while (time < duration)
         {
             time += Time.deltaTime;
-            float alpha = time / duration;
-            fadeImage.color = new Color(0, 0, 0, alpha);
+            fadeImage.color = new Color(0, 0, 0, time / duration);
             yield return null;
         }
 
-        SceneManager.LoadScene(sceneBuildIndex, LoadSceneMode.Single);
+        // ???? Scene ??? Async ??????????????????????
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneBuildIndex, LoadSceneMode.Single);
+        while (!asyncLoad.isDone)
+        {
+            yield return null;
+        }
+
+        // ?? 1 frame ???????? Scene initialize ?????
+        yield return null;
+
+        // ???? Player ?? SpawnPoint
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        GameObject spawnPoint = GameObject.FindWithTag("SpawnPoint");
+
+        if (player != null && spawnPoint != null)
+        {
+            player.transform.position = spawnPoint.transform.position;
+            Debug.Log("Player moved to SpawnPoint: " + spawnPoint.transform.position);
+        }
+        else
+        {
+            Debug.LogWarning("Player: " + player + " | SpawnPoint: " + spawnPoint);
+        }
     }
 }
