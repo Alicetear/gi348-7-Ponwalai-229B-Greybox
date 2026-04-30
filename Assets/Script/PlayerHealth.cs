@@ -8,7 +8,7 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("Invincibility")]
     private bool isInvincible = false;
-    public float invincibleDuration = 0.5f;
+    public float invincibleDuration = 0.1f;
 
     void Start()
     {
