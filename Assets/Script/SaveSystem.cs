@@ -10,9 +10,10 @@ public class SaveData
     public float posX, posY;
     public int health;
     public int redKey, blueKey, greenKey, yellowKey, purpleKey, pinkKey;
+    public int fuel;
     public string sceneName;
     public string saveTime;
-    public float playTime;
+    public float playTime;           
     public string screenshotB64;
     public List<string> openedDoorIDs = new List<string>();
 }
@@ -24,11 +25,6 @@ public class SaveSystem : MonoBehaviour
     public static int lastUsedSlot = 0;
 
     public List<string> currentOpenedDoors = new List<string>();
-
-    [Header("References")]
-    public Transform player;
-    public PlayerHealth playerHealth;
-    public playerkey inventory;
 
     void Awake()
     {
@@ -49,20 +45,8 @@ public class SaveSystem : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        AutoFind();
         if (isRespawning)
             StartCoroutine(ApplyLoadData());
-    }
-
-    public void AutoFind()
-    {
-        GameObject p = GameObject.FindGameObjectWithTag("Player");
-        if (p != null)
-        {
-            player = p.transform;
-            playerHealth = p.GetComponent<PlayerHealth>();
-            inventory = p.GetComponent<playerkey>();
-        }
     }
 
     IEnumerator ApplyLoadData()
@@ -70,12 +54,32 @@ public class SaveSystem : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
         SaveData data = GetSlotData(lastUsedSlot);
-        if (data == null || player == null)
+        if (data == null) { isRespawning = false; yield break; }
+
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+        if (p == null) { isRespawning = false; yield break; }
+
+        // ???????
+        p.transform.position = new Vector2(data.posX, data.posY);
+
+        // HP
+        PlayerHealth ph = p.GetComponent<PlayerHealth>();
+        if (ph != null)
         {
-            isRespawning = false;
-            yield break;
+            ph.currentHealth = data.health;
+            ph.ResetDeathState();
         }
 
+        // Inventory
+        PlayerInventory inv = PlayerInventory.Instance;
+        if (inv != null)
+        {
+            inv.SetKeys(data.redKey, data.blueKey, data.greenKey,
+                        data.yellowKey, data.purpleKey, data.pinkKey);
+            inv.currentFuel = data.fuel;
+        }
+
+        // Doors / Levers / PowerSlots
         currentOpenedDoors = new List<string>(data.openedDoorIDs);
 
         Door[] allDoors = UnityEngine.Object.FindObjectsByType<Door>(FindObjectsSortMode.None);
@@ -93,85 +97,54 @@ public class SaveSystem : MonoBehaviour
             if (!string.IsNullOrEmpty(ps.powerSlotID) && currentOpenedDoors.Contains(ps.powerSlotID))
                 ps.Activate(false);
 
-        player.position = new Vector2(data.posX, data.posY);
-
-        if (playerHealth != null)
-        {
-            playerHealth.currentHealth = data.health;
-            playerHealth.ResetDeathState();
-        }
-
-        // ? ?????????
-        if (inventory != null)
-        {
-            inventory.redKey = data.redKey;
-            inventory.blueKey = data.blueKey;
-            inventory.greenKey = data.greenKey;
-            inventory.yellowKey = data.yellowKey;
-            inventory.purpleKey = data.purpleKey;
-            inventory.pinkKey = data.pinkKey;
-        }
-
         isRespawning = false;
     }
 
-    public void SaveGame(int slot, string screenshotB64 = "")
+    public void SaveGame(int slot)
     {
-        AutoFind();
-        if (player == null) return;
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+        if (p == null) return;
 
         lastUsedSlot = slot;
 
+        PlayerHealth ph = p.GetComponent<PlayerHealth>();
+        PlayerInventory inv = PlayerInventory.Instance;
+
         SaveData data = new SaveData
         {
-            posX = player.position.x,
-            posY = player.position.y,
-            health = playerHealth != null ? playerHealth.currentHealth : 100,
-            redKey = inventory != null ? inventory.redKey : 0,
-            blueKey = inventory != null ? inventory.blueKey : 0,
-            greenKey = inventory != null ? inventory.greenKey : 0,
-            yellowKey = inventory != null ? inventory.yellowKey : 0,
-            purpleKey = inventory != null ? inventory.purpleKey : 0,
-            pinkKey = inventory != null ? inventory.pinkKey : 0,
+            posX = p.transform.position.x,
+            posY = p.transform.position.y,
+            health = ph != null ? ph.currentHealth : 100,
+            fuel = inv != null ? inv.currentFuel : 0,
+            redKey = inv != null ? inv.GetKeyCount(KeyColor.Red) : 0,
+            blueKey = inv != null ? inv.GetKeyCount(KeyColor.Blue) : 0,
+            greenKey = inv != null ? inv.GetKeyCount(KeyColor.Green) : 0,
+            yellowKey = inv != null ? inv.GetKeyCount(KeyColor.Yellow) : 0,
+            purpleKey = inv != null ? inv.GetKeyCount(KeyColor.Purple) : 0,
+            pinkKey = inv != null ? inv.GetKeyCount(KeyColor.Pink) : 0,
             sceneName = SceneManager.GetActiveScene().name,
             saveTime = DateTime.Now.ToString("dd/MM/yyyy HH:mm"),
-            playTime = Time.timeSinceLevelLoad,
-            screenshotB64 = screenshotB64,
             openedDoorIDs = new List<string>(currentOpenedDoors)
         };
 
         PlayerPrefs.SetString("save_slot_" + slot, JsonUtility.ToJson(data));
         PlayerPrefs.Save();
+        Debug.Log($"Saved slot {slot} | Scene: {data.sceneName} | Doors: {currentOpenedDoors.Count}");
+    }
 
-        Debug.Log($"Saved Slot {slot + 1} | Doors opened: {currentOpenedDoors.Count}");
+    public void LoadGame(int slot)
+    {
+        SaveData data = GetSlotData(slot);
+        if (data == null) { Debug.LogWarning("No save data in slot " + slot); return; }
+
+        lastUsedSlot = slot;
+        isRespawning = true;
+        SceneManager.LoadScene(data.sceneName);
     }
 
     public void RespawnAtLastSave()
     {
-        SaveData data = GetSlotData(lastUsedSlot);
-        if (data != null)
-        {
-            // ? ?? save data ? ???? save
-            currentOpenedDoors = new List<string>(data.openedDoorIDs);
-            isRespawning = true;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
-        else
-        {
-            // ? ????? save data ? reload scene ?????? ??????? load save
-            isRespawning = false;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
-    }
-
-    public void LoadGameFromMenu(int slot)
-    {
-        if (!PlayerPrefs.HasKey("save_slot_" + slot)) return;
-
-        lastUsedSlot = slot;
-        isRespawning = true;
-
-        SceneManager.LoadScene(GetSlotData(slot).sceneName);
+        LoadGame(lastUsedSlot);
     }
 
     public SaveData GetSlotData(int slot)

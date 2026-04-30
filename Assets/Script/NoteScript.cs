@@ -4,10 +4,24 @@ public class NoteScript : MonoBehaviour
 {
     private bool noteStatus;
     public GameObject note;
-    public GameObject promptUI; // "?? E ?????????" — ????????????????????
+    public GameObject promptUI;
+
+   
+    [Header("Sound")]
+    public AudioSource audioSource;
+    public AudioClip openSound;      
+    public AudioClip lockedSound;
+
+    [Header("Animation")]
+    public Animator doorAnimator;
 
     private bool playerInRange = false;
 
+    void Start()
+    {
+        if (promptUI != null) promptUI.SetActive(false);
+        if (note != null) note.SetActive(false);
+    }
     void Update()
     {
         if (playerInRange && Input.GetKeyDown(KeyCode.E))
@@ -29,7 +43,6 @@ public class NoteScript : MonoBehaviour
         {
             playerInRange = false;
             if (promptUI != null) promptUI.SetActive(false);
-            // ??? note ??????????????
             if (noteStatus) ToggleNote();
         }
     }

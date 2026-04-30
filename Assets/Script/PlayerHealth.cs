@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public int maxHealth = 100;
+     public int maxHealth = 100;
     public int currentHealth;
     private bool isDead = false;
 
@@ -21,12 +21,13 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
-        if (isDead) return; 
+        if (isDead) return;
         isDead = true;
 
-        DeathManager dm = FindFirstObjectByType<DeathManager>();
-        if (dm != null) dm.ShowDeathUI();
-
+        if (DeathManager.Instance != null)
+            DeathManager.Instance.ShowDeathUI();
+        else
+            Debug.LogError("DeathManager Instance not found!");
     }
 
     void Respawn()
@@ -37,6 +38,6 @@ public class PlayerHealth : MonoBehaviour
 
     public void ResetDeathState()
     {
-        isDead = false; 
+        isDead = false;
     }
 }

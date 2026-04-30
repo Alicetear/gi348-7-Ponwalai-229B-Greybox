@@ -35,6 +35,18 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
+    // ?????? load save
+    public void SetKeys(int red, int blue, int green, int yellow, int purple, int pink)
+    {
+        keys[KeyColor.Red] = red;
+        keys[KeyColor.Blue] = blue;
+        keys[KeyColor.Green] = green;
+        keys[KeyColor.Yellow] = yellow;
+        keys[KeyColor.Purple] = purple;
+        keys[KeyColor.Pink] = pink;
+        OnInventoryChanged?.Invoke();
+    }
+
     // Fuel
     public bool AddFuel(int amount)
     {

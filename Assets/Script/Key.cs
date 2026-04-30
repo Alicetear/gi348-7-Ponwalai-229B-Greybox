@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public enum KeyColor
 {
@@ -18,12 +19,29 @@ public class Key : MonoBehaviour
 
     private bool playerInRange = false;
     private PlayerInventory inventory;
+    public string keyID;
+
+    void Start()
+    {
+        if (!string.IsNullOrEmpty(keyID) &&
+            SaveSystem.Instance != null &&
+            SaveSystem.Instance.currentOpenedDoors.Contains(keyID))
+        {
+            Destroy(gameObject);
+        }
+    }
+
 
     void Update()
     {
         if (playerInRange && Input.GetKeyDown(KeyCode.F))
         {
             inventory.AddKey(amount, color);
+
+            if (!string.IsNullOrEmpty(keyID) && SaveSystem.Instance != null)
+                if (!SaveSystem.Instance.currentOpenedDoors.Contains(keyID))
+                    SaveSystem.Instance.currentOpenedDoors.Add(keyID);
+
             Destroy(gameObject);
         }
     }
