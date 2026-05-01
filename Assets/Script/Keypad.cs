@@ -25,7 +25,7 @@ public class Keypad : MonoBehaviour
 
     private Vector3 originalPos;
 
-    private string Answer = "1234";
+    private string Answer = "7832";
 
     public void Number(int number)
     {

@@ -15,7 +15,7 @@ public class LightTrigger : MonoBehaviour
     public float messageDuration = 5f;
 
     private GameObject player;
-    private bool lightsOff = false;
+    public bool lightsOff = false;
     private AudioSource audioSource;
     private Text hintText;
 

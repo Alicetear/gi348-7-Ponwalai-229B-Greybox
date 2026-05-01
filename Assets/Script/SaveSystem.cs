@@ -3,6 +3,7 @@ using System;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Rendering.Universal;
 
 [System.Serializable]
 public class SaveData
@@ -16,6 +17,8 @@ public class SaveData
     public float playTime;           
     public string screenshotB64;
     public List<string> openedDoorIDs = new List<string>();
+    public float globalLightIntensity = 1f; 
+    public bool lightsOff = false;
 }
 
 public class SaveSystem : MonoBehaviour
@@ -59,7 +62,6 @@ public class SaveSystem : MonoBehaviour
         GameObject p = GameObject.FindGameObjectWithTag("Player");
         if (p == null) { isRespawning = false; yield break; }
 
-        // ???????
         p.transform.position = new Vector2(data.posX, data.posY);
 
         // HP
@@ -97,6 +99,17 @@ public class SaveSystem : MonoBehaviour
             if (!string.IsNullOrEmpty(ps.powerSlotID) && currentOpenedDoors.Contains(ps.powerSlotID))
                 ps.Activate(false);
 
+        Light2D globalLight = GameObject.Find("Global Light 2D")?.GetComponent<Light2D>();
+        if (globalLight != null)
+            globalLight.intensity = data.globalLightIntensity;
+
+        if (data.lightsOff)
+        {
+            LightTrigger lt = UnityEngine.Object.FindFirstObjectByType<LightTrigger>();
+            if (lt != null)
+                lt.lightsOff = true;
+        }
+
         isRespawning = false;
     }
 
@@ -109,6 +122,15 @@ public class SaveSystem : MonoBehaviour
 
         PlayerHealth ph = p.GetComponent<PlayerHealth>();
         PlayerInventory inv = PlayerInventory.Instance;
+
+        Texture2D tex = ScreenCapture.CaptureScreenshotAsTexture();
+        byte[] bytes = tex.EncodeToJPG(50);
+        Destroy(tex);
+        string screenshot = Convert.ToBase64String(bytes);
+
+        Light2D globalLight = GameObject.Find("Global Light 2D")?.GetComponent<Light2D>();
+        float lightIntensity = globalLight != null ? globalLight.intensity : 1f;
+        bool isLightsOff = globalLight != null && globalLight.intensity == 0f;
 
         SaveData data = new SaveData
         {
@@ -124,7 +146,9 @@ public class SaveSystem : MonoBehaviour
             pinkKey = inv != null ? inv.GetKeyCount(KeyColor.Pink) : 0,
             sceneName = SceneManager.GetActiveScene().name,
             saveTime = DateTime.Now.ToString("dd/MM/yyyy HH:mm"),
-            openedDoorIDs = new List<string>(currentOpenedDoors)
+            openedDoorIDs = new List<string>(currentOpenedDoors),
+            playTime = Time.realtimeSinceStartup, 
+            screenshotB64 = CaptureScreenshot()   
         };
 
         PlayerPrefs.SetString("save_slot_" + slot, JsonUtility.ToJson(data));
@@ -132,6 +156,13 @@ public class SaveSystem : MonoBehaviour
         Debug.Log($"Saved slot {slot} | Scene: {data.sceneName} | Doors: {currentOpenedDoors.Count}");
     }
 
+    private string CaptureScreenshot()
+    {
+        Texture2D tex = ScreenCapture.CaptureScreenshotAsTexture();
+        byte[] bytes = tex.EncodeToJPG(50); 
+        Destroy(tex);
+        return Convert.ToBase64String(bytes);
+    }
     public void LoadGame(int slot)
     {
         SaveData data = GetSlotData(slot);

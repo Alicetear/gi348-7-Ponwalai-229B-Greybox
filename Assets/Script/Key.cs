@@ -20,9 +20,14 @@ public class Key : MonoBehaviour
     private bool playerInRange = false;
     private PlayerInventory inventory;
     public string keyID;
+    public GameObject promptUI;
+     public float hideDistance = 2f;
+
+    private Transform playerTransform;
 
     void Start()
     {
+        if (promptUI != null) promptUI.SetActive(false);
         if (!string.IsNullOrEmpty(keyID) &&
             SaveSystem.Instance != null &&
             SaveSystem.Instance.currentOpenedDoors.Contains(keyID))
@@ -34,6 +39,17 @@ public class Key : MonoBehaviour
 
     void Update()
     {
+        if (playerTransform != null)
+        {
+            float dist = Vector2.Distance(transform.position, playerTransform.position);
+            if (dist > hideDistance)
+            {
+                playerInRange = false;
+                playerTransform = null;
+                if (promptUI != null) promptUI.SetActive(false);
+            }
+        }
+
         if (playerInRange && Input.GetKeyDown(KeyCode.F))
         {
             inventory.AddKey(amount, color);
@@ -48,10 +64,17 @@ public class Key : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !playerInRange)
         {
             playerInRange = true;
+            playerTransform = other.transform;
             inventory = other.GetComponent<PlayerInventory>();
+            if (promptUI != null)
+            {
+                if (promptUI.transform.parent != null)
+                    promptUI.transform.parent.gameObject.SetActive(true);
+                promptUI.SetActive(true);
+            }
         }
     }
 
