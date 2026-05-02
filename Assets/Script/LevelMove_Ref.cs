@@ -46,17 +46,14 @@ public class LevelMove_Ref : MonoBehaviour
             yield return null;
         }
 
-        // ???? Scene ??? Async ??????????????????????
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneBuildIndex, LoadSceneMode.Single);
         while (!asyncLoad.isDone)
         {
             yield return null;
         }
 
-        // ?? 1 frame ???????? Scene initialize ?????
         yield return null;
 
-        // ???? Player ?? SpawnPoint
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         GameObject spawnPoint = GameObject.FindWithTag("SpawnPoint");
 

@@ -10,6 +10,11 @@ public class Lever : MonoBehaviour
     [Header("Save System")]
     public string leverID;
 
+    [Header("Audio Settings")]
+    public AudioSource audioSource;    
+    public AudioClip activateSound;   
+    public AudioClip noPowerSound;
+
     private bool playerInRange = false;
     private bool isActivated = false;
 
@@ -19,9 +24,21 @@ public class Lever : MonoBehaviour
         if (playerInRange && Input.GetKeyDown(KeyCode.E) && !isActivated)
         {
             if (!hasPower)
+            {
                 Debug.Log("No Power");
+                if (audioSource != null && noPowerSound != null)
+                {
+                    audioSource.PlayOneShot(noPowerSound);
+                }
+            }
             else
+            {
                 Activate(true);
+                if (audioSource != null && activateSound != null)
+                {
+                    audioSource.PlayOneShot(activateSound);
+                }
+            }
         }
     }
 

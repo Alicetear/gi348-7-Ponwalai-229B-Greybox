@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class PowerSlot : MonoBehaviour
@@ -6,32 +7,69 @@ public class PowerSlot : MonoBehaviour
     public Lever leverScript;
     public GameObject lever;
 
+    [Header("UI Settings")]
+    public GameObject interactionUI;    
+    public TextMeshProUGUI hintText;
+
     [Header("Save System")]
     public string powerSlotID;
+
+    [Header("Audio Settings")]
+    public AudioSource audioSource; 
+    public AudioClip activateSound;
 
     private bool playerInRange = false;
     private bool isActivated = false;
 
     void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E) && !isActivated)
+        if (playerInRange && !isActivated)
+        {
+            UpdateUI();
+
+            if (playerInRange && Input.GetKeyDown(KeyCode.E) && !isActivated)
+            {
+                PlayerInventory inventory = PlayerInventory.Instance;
+
+                if (inventory == null)
+                {
+                    Debug.Log("No PlayerInventory");
+                    return;
+                }
+
+                if (inventory.GetFuel() <= 0)
+                    Debug.Log("No Power");
+                else if (inventory.GetFuel() < requiredFuel)
+                    Debug.Log("Need more: " + (requiredFuel - inventory.GetFuel()));
+                else
+                {
+                    inventory.UseFuel(requiredFuel);
+                    Activate(true);
+
+                    if (audioSource != null && activateSound != null)
+                    {
+                        audioSource.PlayOneShot(activateSound);
+                    }
+                }
+            }
+        }
+    }
+
+    void UpdateUI()
+    {
+        if (hintText != null)
         {
             PlayerInventory inventory = PlayerInventory.Instance;
+            int currentFuel = (inventory != null) ? inventory.GetFuel() : 0;
 
-            if (inventory == null)
+            if (currentFuel < requiredFuel)
             {
-                Debug.Log("No PlayerInventory");
-                return;
+                int needed = requiredFuel - currentFuel;
+                hintText.text = "Need " + needed + " more Fuel (E)";
             }
-
-            if (inventory.GetFuel() <= 0)
-                Debug.Log("No Power");
-            else if (inventory.GetFuel() < requiredFuel)
-                Debug.Log("Need more: " + (requiredFuel - inventory.GetFuel()));
             else
             {
-                inventory.UseFuel(requiredFuel);
-                Activate(true);
+                hintText.text = "Press (E) to Activate Power";
             }
         }
     }

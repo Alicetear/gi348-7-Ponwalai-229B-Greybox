@@ -16,18 +16,18 @@ public class Key : MonoBehaviour
 {
     public int amount = 1;
     public KeyColor color;
-
     private bool playerInRange = false;
     private PlayerInventory inventory;
     public string keyID;
     public GameObject promptUI;
-     public float hideDistance = 2f;
-
+    public float hideDistance = 4f;
+    public AudioClip pickupSound;
     private Transform playerTransform;
 
     void Start()
     {
-        if (promptUI != null) promptUI.SetActive(false);
+        HidePrompt();
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
         if (!string.IsNullOrEmpty(keyID) &&
             SaveSystem.Instance != null &&
             SaveSystem.Instance.currentOpenedDoors.Contains(keyID))
@@ -35,7 +35,6 @@ public class Key : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
 
     void Update()
     {
@@ -46,20 +45,37 @@ public class Key : MonoBehaviour
             {
                 playerInRange = false;
                 playerTransform = null;
-                if (promptUI != null) promptUI.SetActive(false);
+                HidePrompt();
             }
         }
 
         if (playerInRange && Input.GetKeyDown(KeyCode.F))
         {
-            inventory.AddKey(amount, color);
-
+            if (inventory != null) inventory.AddKey(amount, color);
             if (!string.IsNullOrEmpty(keyID) && SaveSystem.Instance != null)
                 if (!SaveSystem.Instance.currentOpenedDoors.Contains(keyID))
                     SaveSystem.Instance.currentOpenedDoors.Add(keyID);
-
+            if (pickupSound != null)
+                AudioSource.PlayClipAtPoint(pickupSound, transform.position, 5f);
             Destroy(gameObject);
         }
+
+    }
+
+    void ShowPrompt()
+    {
+        if (promptUI == null) return;
+        if (promptUI.transform.parent != null)
+            promptUI.transform.parent.gameObject.SetActive(true);
+        promptUI.SetActive(true);
+    }
+
+    void HidePrompt()
+    {
+        if (promptUI == null) return;
+        promptUI.SetActive(false);
+        if (promptUI.transform.parent != null)
+            promptUI.transform.parent.gameObject.SetActive(false);
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -69,12 +85,7 @@ public class Key : MonoBehaviour
             playerInRange = true;
             playerTransform = other.transform;
             inventory = other.GetComponent<PlayerInventory>();
-            if (promptUI != null)
-            {
-                if (promptUI.transform.parent != null)
-                    promptUI.transform.parent.gameObject.SetActive(true);
-                promptUI.SetActive(true);
-            }
+            ShowPrompt();
         }
     }
 
@@ -83,7 +94,9 @@ public class Key : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
+            playerTransform = null;
             inventory = null;
+            HidePrompt();
         }
     }
 }
